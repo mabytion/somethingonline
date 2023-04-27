@@ -43,7 +43,7 @@ struct udata
 
 int user_fds[SOMAXCONN];
 
-void send_msg(struct epoll_event ev, char* msg);
+void sendMsg(struct epoll_event ev, char* msg);
 
 int main()
 {
@@ -58,11 +58,13 @@ int main()
 	int ret = 0;
 	int epoll_fd = 0;
 	int client_fd_size = 0;
+	int optval = 1;
 
 	struct udata* user_data;
 
 	char buf[BUFF_SIZE+1];
 	char tmp[LOG_SIZE];
+	char conn_str[] = "connected.\n";
 	size_t read_size;
 	int i;
 
@@ -97,6 +99,8 @@ int main()
 	serv_sock.sin_family		= AF_INET;
 	serv_sock.sin_port		= htons(4000);
 	serv_sock.sin_addr.s_addr	= htonl(INADDR_ANY);
+
+	setsockopt(listen_fd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
 
 	if(bind(listen_fd, (struct sockaddr*)&serv_sock, sizeof(serv_sock)) < 0)
 	{
@@ -161,19 +165,14 @@ int main()
 						user_data = malloc(sizeof(user_data));
 						user_data->fd = client_fd;
 		
-						write(user_data->fd, "your name: ", 29);
-		
-						sleep(1);
 						read(user_data->fd, user_data->name, sizeof(user_data->name));
-						user_data->name[strlen(user_data->name)-1] = 0;
+						user_data->name[strlen(user_data->name)] = '\0';
 		
-						printf("yeah [%s] \n", user_data->name);
+						printf("[%s] joined. \n", user_data->name);
 		
-						sleep(1);
+						usleep(25000);
 		
-						sprintf(buf, "your name: %s\n", user_data->name);
-	
-						write(user_data->fd, buf, 40);
+						write(user_data->fd, conn_str, strlen(conn_str));
 		
 						ev.events = EPOLLIN;
 						ev.data.ptr = user_data;
@@ -191,9 +190,6 @@ int main()
 					user_data = events[i].data.ptr;
 					memset(buf, 0, BUFF_SIZE+1);
 					read_size = read(user_data->fd, buf, BUFF_SIZE+1);
-					memset(tmp, 0, LOG_SIZE);
-					sprintf(tmp, "logging >> {%s}.{%s}", user_data->name, buf);
-					write(log_fd, tmp, sizeof(tmp));
 					if(read_size <= 0)
 					{
 						epoll_ctl(epoll_fd, EPOLL_CTL_DEL, user_data->fd, events);
@@ -205,7 +201,10 @@ int main()
 					}
 					else
 					{
-						send_msg(events[i], buf);
+						memset(tmp, 0, LOG_SIZE);
+						sprintf(tmp, "0/chat/chat/%s/%s\0", user_data->name, buf);
+						write(log_fd, tmp, strlen(tmp));
+						sendMsg(events[i], buf);
 					}
 					
 				}
@@ -225,7 +224,7 @@ int main()
 	return 0;
 }
 
-void send_msg(struct epoll_event ev, char* msg)
+void sendMsg(struct epoll_event ev, char* msg)
 {
 	int i;
 	char buf[BUFF_SIZE + 24];

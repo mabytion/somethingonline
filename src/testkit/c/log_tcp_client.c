@@ -36,12 +36,15 @@ int main(int argc, char* argv[])
 
 	int i;
 
-	if(argc < 3)
+	if(argc < 4)
 	{
 		return;
 		
 	}
 	printf("%s\n", addr);
+	int roop = atoi(argv[3]);
+	int sleeptime = atoi(argv[4]);
+	printf("sleeptime: %d\n", sleeptime);
 
 	client_socket = socket(AF_INET, SOCK_STREAM, 0);
 	if(client_socket < 0)
@@ -63,14 +66,14 @@ int main(int argc, char* argv[])
 	
 	char tmp[1000];
 
-	for(i=0;i<5;i++)
+	for(i=0;i<roop;i++)
 	{
 		memset(tmp, 0, 1000);
 		srand((unsigned int)time(NULL));
 		sprintf(tmp, "%d/testserver/testcategory/testid_%s/testdata >> %d\0", rand()%1, argv[2], i);
 		write(client_socket, tmp, strlen(tmp));
 		printf("%s\n", tmp);
-		sleep(1);
+		usleep(sleeptime);
 	}
 	
 	close(client_socket);

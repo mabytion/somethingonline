@@ -16,6 +16,7 @@ int main(int argc, char* argv[])
 	struct sockaddr_in serv_addr;
 
 	char buf[BUFF_SIZE];
+	char name[80];
 
 	int sock_fd;
 	int sock_len;
@@ -26,7 +27,16 @@ int main(int argc, char* argv[])
 	int read_num;
 
 	int first_run = 1;
-	
+
+	if(argc < 2)
+	{
+		snprintf(name, 6, "Guest");
+	}
+	else
+	{
+		strcpy(name, argv[1]);
+	}
+
 	
 	if((sock_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
 	{
@@ -83,6 +93,18 @@ int main(int argc, char* argv[])
 					first_run = 0;
 				}
 			}
+
+			if(write(sock_fd, name, strlen(name)) <= 0)
+			{
+				printf("init(w) err\n");
+				return 1;
+			}
+
+			else
+			{
+				printf("your name: [%s]\n", name);
+			}
+
 		}
 
 		else
