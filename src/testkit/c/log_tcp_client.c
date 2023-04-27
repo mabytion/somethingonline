@@ -32,7 +32,7 @@ int main(int argc, char* argv[])
 	int client_socket;
 	struct sockaddr_in server_addr;
 	char buff[BUFF_SIZE + 5];
-	char addr[] = "192.168.75.13";
+	char addr[] = "192.168.75.11";
 
 	int i;
 
@@ -53,7 +53,7 @@ int main(int argc, char* argv[])
 	memset(&server_addr, 0, sizeof(server_addr));
 	server_addr.sin_family		= AF_INET;
 	server_addr.sin_port		= htons(4001);	
-	server_addr.sin_addr.s_addr	= inet_addr(addr);
+	server_addr.sin_addr.s_addr	= inet_addr(argv[1]);
 
 	if(connect(client_socket, (struct sockaddr*)&server_addr, sizeof(server_addr)))
 	{
