@@ -4,5 +4,5 @@ on:
 	push:
 		branches: master
 jobs: 
-	-name: auto fetch
-    runs: git fetch
+	-name: auto pull
+		runs: git pull
