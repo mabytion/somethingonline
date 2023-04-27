@@ -1,0 +1,8 @@
+name: something Action
+
+on: 
+	push:
+		branches: master
+jobs: 
+	-name: auto fetch
+    runs: git fetch
