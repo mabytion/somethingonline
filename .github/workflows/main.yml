@@ -1,8 +1,0 @@
-name: something Action
-
-on: 
-	push:
-		branches: master
-jobs: 
-	-name: auto pull
-		runs: git pull
