@@ -11,6 +11,8 @@ import (
 func main() {
 	db, _ := sql.Open("mysql", "auth:nasang@/userdb")
 	defer db.Close()
+	fmt.Print("dbinit() >>> ")
+	fmt.Println(db)
 
 	var version string
 	db.QueryRow("SELECT VERSION()").Scan(&version)

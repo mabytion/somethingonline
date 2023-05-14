@@ -1,18 +1,11 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
-	"net/http"
-	)
+	"auth/mappings"
+	_ "github.com/go-sql-driver/mysql"
+       )
 
 func main() {
-	r := gin.Default()
-	r.GET("/ping", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "pong",
-		})
-	})
-
-	r.Run(":8081")
-
+	mappings.CreateUrlMappings()
+	mappings.Router.Run(":8081")
 }
