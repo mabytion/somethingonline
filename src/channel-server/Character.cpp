@@ -1,18 +1,28 @@
 #incldue <"Character.h">
 
-void Character::setFD(int _fd) { fd = _fd; }
-void Character::setName(std::string _name) { name = _name; }
-void Character::setHP(int _hp) { hp = _hp; }
-void Character::setMoney(int _money) { money = _money; }
-void Character::setPosition(struct Position _pos) { pos = _pos; }
-void Character::setPosition(int _x, int _y) { pos.x = _x; pos.y = _y; }
-void Character::setPositionX(int _x) { pos.x = _x; }
-void Character::setPositionY(int _y) { pos.y = _y; }
-void Character::setAtt(int _att) { att = _att; }
-void Character::setDef(int _def) { def = _def; }
-void Character::setSpeed(double _speed) { speed = _speed; }
-void Character::setAttackSpeed(double _attack_speed) { attack_speed = _attack_speed; }
+Character::Character()
+{
+
+}
+Character::~Character()
+{
+	close(fd);
+}
+Character& Character::setFD(int _fd) { fd = _fd; return *this; }
+Character& Character::setSockAddr(struct sockaddr_in _c_addr) { c_addr = _c_addr; return *this; }
+Character& Character::setName(std::string _name) { name = _name; return *this; }
+Character& Character::setHP(int _hp) { hp = _hp; return *this; }
+Character& Character::setMoney(int _money) { money = _money; return *this; }
+Character& Character::setPosition(struct Position _pos) { pos = _pos; return *this; }
+Character& Character::setPosition(int _x, int _y) { pos.x = _x; pos.y = _y; return *this; }
+Character& Character::setPositionX(int _x) { pos.x = _x; return *this; }
+Character& Character::setPositionY(int _y) { pos.y = _y; return *this; }
+Character& Character::setAtt(int _att) { att = _att; return *this; }
+Character& Character::setDef(int _def) { def = _def; return *this; }
+Character& Character::setSpeed(double _speed) { speed = _speed; return *this; }
+Character& Character::setAttackSpeed(double _attack_speed) { attack_speed = _attack_speed; return *this; }
 int Character::getFD(void) { return fd; }
+struct sockaddr_in Character::getSockAddr(void) { return c_addr; }
 std::string Character::getName(void) { return name; }
 int Character::getHP(void) { return hp; }
 int Character::getMoney(void) { return money; }

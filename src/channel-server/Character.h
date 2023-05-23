@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <sys/socket.h>
 
 #ifndef Character_H
 #define Character_H
@@ -14,29 +15,36 @@ Class Character
 {
 private:
 	int fd;
+	struct sockaddr c_addr;
 	std::string name;
-	int hp;
+	int hp = 10;
 	int money;
-	struct Position pos;
-	int att;
-	int def;
-	double speed;
-	double attack_speed;
+	struct Position pos = {0,0};
+	int att = 10;
+	int def = 10;
+	int map;
+	double speed = 0.5;
+	double attack_speed = 0.5;
 
 public:
-	void setFD(int);
-	void setName(std::string);
-	void setHP(int);
-	void setMoney(int);
-	void setPosition(struct Position);
-	void setPosition(int, int);
-	void setPositionX(int);
-	void setPositionY(int);
-	void setAtt(int);
-	void setDef(int);
-	void setSpeed(double);
-	void setAttackSpeed(double);
+	Character();
+	~Character();
+	Character& setFD(int);
+	Character& setSockAddr(struct sockaddr);
+	Character& setName(std::string);
+	Character& setHP(int);
+	Character& setMoney(int);
+	Character& setPosition(struct Position);
+	Character& setPosition(int, int);
+	Character& setPositionX(int);
+	Character& setPositionY(int);
+	Character& setAtt(int);
+	Character& setDef(int);
+	Character& setMap(int);
+	Character& setSpeed(double);
+	Character& setAttackSpeed(double);
 	int getFD(void);
+	struct sockaddr getSockAddr(void);
 	std::string getName(void);
 	int getHP(void);
 	int getMoney(void);
@@ -45,6 +53,7 @@ public:
 	int getPositionY(void);
 	int getAtt(void);
 	int getDef(void);
+	int getMap(void);
 	double getSpeed(void);
 	double getAttackSpeed(void);
 

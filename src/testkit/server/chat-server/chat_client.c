@@ -47,8 +47,8 @@ int main(int argc, char* argv[])
 
 	memset(&serv_addr, 0, sizeof(serv_addr));
 	serv_addr.sin_family = AF_INET;
-	serv_addr.sin_addr.s_addr = inet_addr("192.168.75.13");
-	serv_addr.sin_port = htons(4000);
+	serv_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
+	serv_addr.sin_port = htons(8082);
 
 	if(connect(sock_fd, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) < 0)
 	{

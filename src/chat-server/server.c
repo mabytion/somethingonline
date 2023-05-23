@@ -86,6 +86,7 @@ int main()
 		printf("connect err\n");
 		fprintf(stderr, "%s\n", strerror(errno));
 	}
+	printf("Connected.\n");
 
 
 	/* serv sock setting */
@@ -94,10 +95,11 @@ int main()
 		printf("create socket fail\n");
 		return -1;
 	}
+	printf("Passive Socket Created.\n");
 
 	memset(&serv_sock, 0, sizeof(serv_sock));
 	serv_sock.sin_family		= AF_INET;
-	serv_sock.sin_port		= htons(4000);
+	serv_sock.sin_port			= htons(8082);
 	serv_sock.sin_addr.s_addr	= htonl(INADDR_ANY);
 
 	setsockopt(listen_fd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
@@ -107,12 +109,14 @@ int main()
 		printf("bind fail\n");
 		return -1;
 	}
+	printf("Binded.\n");
 			
 	if(listen(listen_fd, 5))
 	{
 		printf("listen fail\n");
 		exit(1);
 	}
+	printf("Listened.\n");
 
 	/* epoll create */
 	if((epoll_fd = epoll_create(SOMAXCONN)) < 0)
@@ -120,19 +124,24 @@ int main()
 		printf("epoll_create() fail\n");
 		return -1;
 	}
+	printf("epoll_fd Created.\n");
+
 
 	/* epoll setting */
-	ev.events = EPOLLIN;
+	ev.events = EPOLLIN | EPOLLET;
 	ev.data.fd = epoll_fd;
 
 	/* epoll add */
 	epoll_ctl(epoll_fd, EPOLL_CTL_ADD, listen_fd, &ev);
 	memset(user_fds, -1, sizeof(int) * SOMAXCONN);
+	printf("epoll Added.\n");
 
 	while(1)
 	{
 		/* epoll wait */
+		printf("ret = %d.\n", ret);
 		ret = epoll_wait(epoll_fd, events, SOMAXCONN, -1);
+		printf("epoll_fd reached.\n", ret);
 
 		if(ret < -1)
 		{
