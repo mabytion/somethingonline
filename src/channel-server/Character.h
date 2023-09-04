@@ -1,15 +1,10 @@
 #include <iostream>
 #include <string>
 #include <sys/socket.h>
+#include <"mytype.h">
 
 #ifndef Character_H
 #define Character_H
-
-struct Position
-{
-	int X;
-	int Y;
-};
 
 Class Character
 {
@@ -43,19 +38,19 @@ public:
 	Character& setMap(int);
 	Character& setSpeed(double);
 	Character& setAttackSpeed(double);
-	int getFD(void);
-	struct sockaddr getSockAddr(void);
-	std::string getName(void);
-	int getHP(void);
-	int getMoney(void);
-	struct Postition getPosition(void);
-	int getPositionX(void);
-	int getPositionY(void);
-	int getAtt(void);
-	int getDef(void);
-	int getMap(void);
-	double getSpeed(void);
-	double getAttackSpeed(void);
+	int getFD();
+	struct sockaddr getSockAddr();
+	std::string getName();
+	int getHP();
+	int getMoney();
+	struct Postition getPosition();
+	int getPositionX();
+	int getPositionY();
+	int getAtt();
+	int getDef();
+	int getMap();
+	double getSpeed();
+	double getAttackSpeed();
 
 	virtual void attack();
 	virtual void hit();
@@ -66,17 +61,20 @@ public:
 Class Player
 {
 private:
-	int inventory[30];
+	std::string id;
+	int inventory[15];
 	int equip[2];
 
 public:
+	void setID();
 	void setInventoryAll(int*);
 	void setInventoryOne(int, int);
 	void setEquipAll(int*);
 	void setEquipOne(int, int);
-	int* getInventoryAll(void);
+	string getID();
+	int* getInventoryAll();
 	int getInventoryOne(int);
-	int* getEquipAll(void);
+	int* getEquipAll();
 	int getEquipOne(int);
 
 };
@@ -88,8 +86,8 @@ private:
 	int exp_table;
 
 public:
-	int getDropTable(void);
-	int getExpTable(void);
+	int getDropTable();
+	int getExpTable();
 
 	void drop();
 

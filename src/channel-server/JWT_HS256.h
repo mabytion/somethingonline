@@ -53,9 +53,9 @@ public:
 	JWToken(string, string);
 	void setPlain(string);
 	void setKey(string);
-	string createVerify(void);
+	string createVerify();
 	string createVerify(string, string);
-	string verifyToken(string);
+	bool verifyToken(string);
 	string B64Encode(string);
 	string B64Decode(string);
 	

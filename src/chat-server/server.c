@@ -31,6 +31,8 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 
+#include "header/jwt-c.h"
+
 #define MAX_CLIENT 100
 #define BUFF_SIZE 1024
 #define LOG_SIZE 1536
@@ -41,12 +43,17 @@ struct udata
 	char name[80];
 };
 
+const char* skey = "2JkpyD4C5v_qW=nzKkGCKCG-hhhb6K&2sk+m-72s^ntMXWC3fHUt^b6s7Ksg7DmA";
 int user_fds[SOMAXCONN];
 
 void sendMsg(struct epoll_event ev, char* msg);
 
 int main()
 {
+//	struct node** hashTable = createHashTable();
+	struct JToken* token;
+	struct node** hashTable;
+
 	struct sockaddr_in serv_sock, client_sock;
 	struct sockaddr_in log_sock;
 	struct epoll_event* events;	
@@ -139,9 +146,8 @@ int main()
 	while(1)
 	{
 		/* epoll wait */
-		printf("ret = %d.\n", ret);
 		ret = epoll_wait(epoll_fd, events, SOMAXCONN, -1);
-		printf("epoll_fd reached.\n", ret);
+		printf("epoll_fd reached. ret=%d\n", ret);
 
 		if(ret < -1)
 		{
@@ -160,22 +166,56 @@ int main()
 			/* fd work */
 			for(i=0;i<ret;i++)
 			{	
+			#ifdef DEBUG
+				printf("event occured\n");
+				printf("event number: %d\n", i);
+			#endif
 				if(events[i].data.fd == epoll_fd)
 				{
 					memset(buf, 0, BUFF_SIZE+1);
 					client_fd_size = sizeof(client_sock);
 					client_fd = accept(listen_fd, (struct sockaddr*)&client_sock, &client_fd_size);
+
+				#ifdef DEBUG
+					printf("accept fd: %d\n", client_fd);
+				#endif
+
 					read(client_fd, buf, BUFF_SIZE+1);
-					if(strncmp(buf, "ok", 2) == 0)
+
+				#ifdef DEBUG
+					printf("read: %s\n", buf);
+				#endif
+
+					token = initJToken(buf);
+					if(verifyJToken(token, skey))
 					{
+						decodeJToken(token);
+				#ifdef DEBUG
+					printf("decodeJToken: %s [%d]\n", token->payload, strlen(token->payload));
+				#endif
+						hashTable = createHashTable();
+						parseJSON_n(&hashTable, token->payload, strlen(token->payload));
+				#ifdef DEBUG
+					printf("hashTable\n");
+					printHashTable(&hashTable);
+				#endif
+						
 						write(client_fd, "ok\n", 3);
+				#ifdef DEBUG
+					printf("client_fd: %d\n", client_fd);
+				#endif
 						user_fds[client_fd] = 1;
 		
-						user_data = malloc(sizeof(user_data));
+						user_data = (struct udata*)malloc(sizeof(user_data) * 1);
 						user_data->fd = client_fd;
-		
-						read(user_data->fd, user_data->name, sizeof(user_data->name));
-						user_data->name[strlen(user_data->name)] = '\0';
+						char* tmp = getValuebyKey(&hashTable, "user");
+						printf("test>> %p ", user_data->name);
+						for(i=0;tmp[i];i++)
+						{
+							user_data->name[i] = tmp[i];
+						}
+						user_data->name[i] = '\0';
+						printf("%p\n", user_data->name);
 		
 						printf("[%s] joined. \n", user_data->name);
 		
@@ -187,10 +227,23 @@ int main()
 						ev.data.ptr = user_data;
 		
 						epoll_ctl(epoll_fd, EPOLL_CTL_ADD, client_fd, &ev);
+
+						printf(">> %p\n", user_data);
+
+//						freeJToken(token);
+//				#ifdef DEBUG
+//					printf("== freeJToken Complete ==\n");
+//				#endif
+						deleteHashTable(&hashTable);
+				#ifdef DEBUG
+					printf("== cleanHashTable Complete ==\n");
+				#endif
+						
 					}
 					else
 					{
 						printf("close fd: %d\n",  client_fd);
+						user_fds[client_fd] = -1;
 						close(client_fd);
 					}
 				}
@@ -204,8 +257,11 @@ int main()
 						epoll_ctl(epoll_fd, EPOLL_CTL_DEL, user_data->fd, events);
 						close(user_data->fd);
 						printf("close fd: %d\n", user_data->fd);
-						printf("Connection lost: %s\n", user_data->name);
+						printf("Connection lost: %s %p\n", user_data->name, user_data);
 						user_fds[user_data->fd] = -1;
+
+						printf("user_data = %p\n", user_data);
+
 						free(user_data);
 					}
 					else

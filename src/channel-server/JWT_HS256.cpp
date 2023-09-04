@@ -30,7 +30,7 @@ JWToken::JWToken(string _plain, string _skey)
 }
 void JWToken::setPlain(string _plain) { plain = _plain; }
 void JWToken::setKey(string _skey) { skey = _skey; };
-string JWToken::createVerify(void)
+string JWToken::createVerify()
 {
 	string mac;
 
@@ -53,7 +53,7 @@ string JWToken::createVerify(string _plain, string _skey)
 	setKey(_skey);
 	return createVerify();
 }
-string JWToken::verifyToken(string _token)
+bool JWToken::verifyToken(string _token)
 {
 	vector<string> token = split(_token, '.');
 	string hpp = token[0];
@@ -64,16 +64,12 @@ string JWToken::verifyToken(string _token)
 
 	string vtoken = createVerify(hpp, skey);
 	
-	if(vtoken.compare(token[2]) == 0)
+	if(vtoken.compare(token[2]) != 0)
 	{
-		return "OK";
-	}
-	else
-	{
-		return "Fail";
+		return false;
 	}
 
-	return "OK";
+	return true;
 }
 string JWToken::B64Encode(string _plain)
 {

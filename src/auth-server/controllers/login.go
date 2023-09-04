@@ -75,19 +75,10 @@ func PostUser(c *gin.Context) {
 
 	if user.Id != "" && user.Passwd != "" && user.Email != "" {
 		if insert, _ := dbmap.Exec(`INSERT INTO user (id, passwd, email) VALUES (?, ?, ?)`, user.Id, user.Passwd, user.Email); insert != nil {
-			user_id, err := insert.LastInsertId()
-			if err == nil {
-				content := &models.User{
-					Cid:	user_id,
-					Id:	user.Id,
-					Passwd:	user.Passwd,
-					Email: user.Email,
-				}
-				c.JSON(201, content)
+				c.JSON(201, gin.H{"message":"signup successful"})
 			} else {
-				checkErr(err, "Insert failed");
 			}
-		}
+		
 	} else {
 		c.JSON(404, gin.H{"error":"Fields are empty"})
 	}
