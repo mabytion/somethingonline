@@ -19,11 +19,6 @@ struct node* createNode(const char* key, const char* data)
 {
 	struct node* newNode = (struct node*)malloc(sizeof(struct node));
 
-#ifdef DEBUG
-	printf("== Create Node ==\n");
-	printf("key: %s %d  value: %s %d\n", key, strlen(key), data, strlen(data));
-#endif
-
 	int keyLen = strlen(key);
 	int dataLen = strlen(data);
 	int i;
@@ -78,12 +73,6 @@ char* getValuebyKey(struct node*** hashTable, const char* key)
 void insertNode(struct node*** hashTable, struct node* dataNode)
 {
 	unsigned int index = ELFHash(dataNode->key) % TABLECAPA;
-
-#ifdef DEBUG
-	printf("====== insert Node ======\n");
-	printf("%d\n", index);
-	printf("=========================\n");
-#endif
 
 	struct node** tmp = (*hashTable)+index;
 	struct node* tmp2 = *tmp;
@@ -211,9 +200,6 @@ void cleanHashTable(struct node*** hashTable)
 
 	for(i=0;i<TABLECAPA;i++)
 	{
-		printf("===========\n");
-		peekNode(*(*(hashTable)+i));
-		printf("===========\n");
 		if(*(*(hashTable)+i) == NULL)
 		{
 			
@@ -246,11 +232,6 @@ void cleanHashTable(struct node*** hashTable)
 
 void freeNode(struct node* dataNode)
 {
-#ifdef DEBUG
-	printf("==== free Node ====\n");
-	peekNode(dataNode);
-	printf("===================\n");
-#endif
 //	free(dataNode->key);
 //	free(dataNode->value);
 	dataNode->nextPtr = (void*)0;

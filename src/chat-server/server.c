@@ -185,8 +185,8 @@ int main()
 				#ifdef DEBUG
 					printf("read: %s\n", buf);
 				#endif
-
-					token = initJToken(buf);
+					token = createJToken();
+					initJToken(token, buf);
 					if(verifyJToken(token, skey))
 					{
 						decodeJToken(token);
@@ -197,7 +197,6 @@ int main()
 						parseJSON_n(&hashTable, token->payload, strlen(token->payload));
 				#ifdef DEBUG
 					printf("hashTable\n");
-					printHashTable(&hashTable);
 				#endif
 						
 						write(client_fd, "ok\n", 3);
@@ -231,12 +230,12 @@ int main()
 						printf(">> %p\n", user_data);
 
 //						freeJToken(token);
-//				#ifdef DEBUG
-//					printf("== freeJToken Complete ==\n");
-//				#endif
+				#ifdef DEBUG
+					printf("== freeJToken Complete ==\n");
+				#endif
 						deleteHashTable(&hashTable);
 				#ifdef DEBUG
-					printf("== cleanHashTable Complete ==\n");
+					printf("== deleteHashTable Complete ==\n");
 				#endif
 						
 					}

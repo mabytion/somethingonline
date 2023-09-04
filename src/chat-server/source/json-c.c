@@ -42,10 +42,6 @@ struct node** parseJSON(char* msg)
 
 	if(i % 2)
 	{
-	#ifdef DEBUG
-		printf("i: %d\n", i);
-	#endif
-
 
 		deleteHashTable(&hashTable);
 
@@ -57,26 +53,17 @@ struct node** parseJSON(char* msg)
 
 void parseJSON_n(struct node*** hashTable, char* msg, int len)
 {
-#ifdef DEBUG
-	printf("parseJSON Started\n");
-	printHashTable(hashTable);
-#endif
-
 	int i = 0, j = 0;
 	
 	char key[10];
 
 	char* ret_ptr;
 	char* next_ptr;
-//	char* str = (char*)malloc(sizeof(char) * len - 1);
-	char str[1024] = {0,};
 
-	for(j=0;j<len-1;j++)
-	{
-		str[j] = msg[j+1];
-	}
-
-	str[j] = '\0';
+	char* str = getRawData(msg);
+#ifdef DEBUG
+	
+#endif
 
 	ret_ptr = strtok_r(str, SEPS, &next_ptr);
 
@@ -85,24 +72,22 @@ void parseJSON_n(struct node*** hashTable, char* msg, int len)
 		if(i%2 == 0)
 		{
 			j = 0;
-			while(ret_ptr[j] != '\0')
+			while(ret_ptr[j+1] != '\0')
 			{
-				key[j] = ret_ptr[j];
+				key[j] = ret_ptr[j+1];
 				j++;
 			}
-			key[j] = '\0';
+			key[j-1] = '\0';
 		}
 		else
 		{
 		#ifdef DEBUG
 			printf("Data / key: %s %d, value: %s %d\n", key, strlen(key), ret_ptr, strlen(ret_ptr));
-			printf("\n\n\n");
 		#endif
 
-			insertData(hashTable, getRawData(key), getRawData(ret_ptr));
+			insertData(hashTable, key, getRawData(ret_ptr));
 
 		#ifdef DEBUG
-			printHashTable(hashTable);
 			printf("Data inserted\n\n");
 		#endif
 
@@ -114,14 +99,9 @@ void parseJSON_n(struct node*** hashTable, char* msg, int len)
 
 	if(i % 2)
 	{
-	#ifdef DEBUG
-		printf("i: %d\n", i);
-	#endif
-
-		cleanHashTable(hashTable);
+//		cleanHashTable(hashTable);
 	}
 
-//	free(str);
 }
 
 char* getRawData(char* str)

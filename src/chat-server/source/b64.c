@@ -30,8 +30,14 @@ void base64eURL(unsigned char *src, unsigned char *result, int length)
 
 	print_hex("src: ", src, 32);
 
+#ifdef DEBUG
+	printf("==== base64Encoding ====\n");
+	printf("length: %d\n", length);
+#endif
+
 	for(i=0;i<length;i=i+3,j=j+4)
 	{
+		printf("%d %d\n", i+3, j+3);
 		temp.c3 = src[i];
 		if((i+1) > length) temp.c2 = 0x00;
 		else temp.c2 = src[i+1];
@@ -46,6 +52,9 @@ void base64eURL(unsigned char *src, unsigned char *result, int length)
 		if((i+2) > length) result[j+2] = 0x00;
 		if((i+3) > length) result[j+3] = 0x00;
 	}
+#ifdef DEBUG
+	printf("========================\n");
+#endif
 }
 
 
@@ -94,8 +103,15 @@ void base64dURL(unsigned char* src, unsigned char* result, int* length)
 
 	src_length = strlen(src);
 
+#ifdef DEBUG
+	printf("==== base64Decoding ====\n");
+	printf("src_length: %d\n", src_length);
+#endif
 	for(i=0;i<src_length;i+=4, j+=3)
 	{
+#ifdef DEBUG
+		printf("%d %d\n", i+3, j+2);
+#endif
 		temp.e4 = DecodeMimeBase64URL[src[i]];
 		temp.e3 = DecodeMimeBase64URL[src[i+1]];
 		if(src[i+2] == 0x00)
@@ -123,4 +139,7 @@ void base64dURL(unsigned char* src, unsigned char* result, int* length)
 	}
 	
 	*length = j-blank;
+#ifdef DEBUG
+	printf("========================\n");
+#endif
 }

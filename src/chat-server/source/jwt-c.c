@@ -1,12 +1,15 @@
 #include "../header/jwt-c.h"
 
-
-
-struct JToken* initJToken(char* str)
+struct JToken* createJToken()
 {
-	int i = 0;
-
 	struct JToken* token = (struct JToken*)malloc(sizeof(struct JToken) * 1);
+
+	return token;
+}
+
+void initJToken(struct JToken* token, char* str)
+{
+	int i = 0, j;
 
 	char* ret_ptr;
 	char* next_ptr;
@@ -19,11 +22,15 @@ struct JToken* initJToken(char* str)
 		{
 			case 0: token->header = strdup(ret_ptr);
 				break;
-			case 1: token->payload = strdup(ret_ptr);
+			case 1: token->payload = strdup(ret_ptr); 
 				break;
 			case 2: token->verify = strdup(ret_ptr);
 				break;
 		}
+
+#ifdef DEBUG
+		printf("ret_ptr: %s %d\n", ret_ptr, strlen(ret_ptr));
+#endif
 
 		ret_ptr = strtok_r(NULL, ".", &next_ptr);
 		i++;
@@ -34,40 +41,43 @@ struct JToken* initJToken(char* str)
 		token->status = 1;
 
 	#ifdef DEBUG
-		printf("header: %s\n", token->header);
-		printf("payload: %s\n", token->payload);
-		printf("verify: %s\n", token->verify);
+		printf("header: %s %d\n", token->header, strlen(token->header));
+		printf("payload: %s %d\n", token->payload, strlen(token->payload));
+		printf("verify: %s %d\n", token->verify, strlen(token->verify));
 		printf("status: %d\n", token->status);
 	#endif
 	}
 	else
 	{
-		free(token);
-		token = (void*)0;
+		token->status = 0;
 	}
-
-	return token;
-}
-
-void cleanJToken(struct JToken* token)
-{
-	free(token->header);
-	free(token->payload);
-	free(token->verify);
-
-	token->header = (void*)0;
-	token->payload = (void*)0;
-	token->verify = (void*)0;
-
-	char status = '\0';
 }
 
 void freeJToken(struct JToken* token)
 {
+#ifdef DEBUG
+	printf("======== freeJToken() ========\n");
+#endif
+#ifdef DEBUG
+	printf("free: %p\n", token->header);
+#endif
 	free(token->header);
+#ifdef DEBUG
+	printf("free: %p\n", token->payload);
+#endif
 	free(token->payload);
+#ifdef DEBUG
+	printf("free: %p\n", token->verify);
+#endif
 	free(token->verify);
-//	free(token);
+#ifdef DEBUG
+	printf("free: %p\n", token);
+#endif
+	free(token);
+
+#ifdef DEBUG
+	printf("=================================\n");
+#endif
 }
 
 struct JToken* decodeJToken(struct JToken* token)
@@ -84,8 +94,6 @@ struct JToken* decodeJToken(struct JToken* token)
 	else
 	{
 		printf("Decode err\n");
-		free(token);
-		token = (void*)0;
 	}
 
 	return token;
@@ -98,34 +106,41 @@ char* elementDecode(char* element)
 	int memSize;
 
 	strLen = strlen(element);
-	memCarry = strLen * 3 ? 0 : 1;
-	memSize = (3 * strLen) / 4 + memCarry + 1;
+	memCarry = (strLen * 3) % 4 ? 0 : 1;
+	memSize = (strLen * 3) / 4 + memCarry + 1;
 
 	char* res = (char*)malloc(memSize);
 
 	base64dURL(element, res, &strLen);
 	res[memSize] = '\0';
 
-//	free(element);
+	free(element);
+#ifdef DEBUG
+	printf("======== elementDecode() ========\n");
+	printf("free: %p\n", element);
+	printf("res: %p\n", res);
+	printf("strlen: %d\n", strLen);
+	printf("=================================\n");
+#endif
 
 	return res;
 }
 
 char* elementDecode_n(char* element, int len)
 {
-	int strLen = strlen(element);
+	int strLen = len;
 	int memCarry;
 	int memSize;
 
-	memCarry = strLen * 3 ? 0 : 1;
-	memSize = (3 * strLen) / 4 + memCarry + 1;
+	memCarry = (strLen * 3) % 4 ? 0 : 1;
+	memSize = (strLen * 3) / 4 + memCarry + 1;
 
 	char* res = (char*)malloc(memSize);
 
 	base64dURL(element, res, &strLen);
 	res[memSize] = '\0';
 
-//	free(element);
+	free(element);
 
 	return res;
 }
@@ -145,8 +160,6 @@ struct JToken* encodeJToken(struct JToken* token)
 	else
 	{
 		printf("Encode err\n");
-		free(token);
-		token = (void*)0;
 	}
 
 	return token;
@@ -160,14 +173,19 @@ char* elementEncode(char* element)
 
 	strLen = strlen(element);
 	memCarry = (strLen * 4) % 3 ? 1 : 0;
-	memSize = (4 * strLen) / 3 + memCarry + 1;
+	memSize = (strLen * 4) / 3 + memCarry + 1;
 
 	char* res = (char*)malloc(memSize);
 
 	base64eURL(element, res, strLen);
 	res[memSize] = '\0';
-
-//	free(element);
+#ifdef DEBUG
+	printf("======== elementEncode() ========\n");
+	printf("free: %p\n", element);
+	printf("res: %p\n", res);
+	printf("=================================\n");
+#endif
+	free(element);
 
 	return res;
 }
@@ -179,12 +197,14 @@ unsigned char* elementEncode_n(unsigned char* element, int len)
 	int memCarry;
 
 	memCarry = (strLen * 4) % 3 ? 1 : 0;
-	memSize = (4 * strLen) / 3 + memCarry + 1;
+	memSize = (strLen * 4) / 3 + memCarry + 1;
 
 	char* res = (char*)malloc(memSize);
 
 	base64eURL(element, res, strLen);
 	res[memSize] = '\0';
+
+	free(element);
 
 	return res;
 }
@@ -207,8 +227,9 @@ struct JToken* verifyJToken(struct JToken* token, const char* key)
 		
 		HMAC_SHA256(msg, msgLen, key, keyLen, hmac);
 
+		token->verify = elementDecode(token->verify);
 
-		if(ret = verifying(elementDecode_n(token->verify, 32), hmac, 32))
+		if(ret = verifying(token->verify, hmac, 32))
 		{
 			setVerified(token, 1);
 			printf("verified!!!!!\n");
@@ -225,6 +246,7 @@ struct JToken* verifyJToken(struct JToken* token, const char* key)
 	{
 		printf("Verify err\n");
 	}
+
 	
 	return (void*)0;
 }

@@ -30,9 +30,9 @@ struct JToken
 	char status;
 };
 
-
-struct JToken* initJToken(char*);
-void cleanJToken(struct JToken*);
+struct JToken* createJToken();
+void initJToken(struct JToken*, char*);
+void freeJToken(struct JToken*);
 struct JToken* decodeJToken(struct JToken*);
 char* elementDecode(char*);
 char* elementDecode_n(char*, int);
