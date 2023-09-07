@@ -86,7 +86,7 @@ int main()
 	memset(&log_sock, 0, sizeof(log_sock));
 	log_sock.sin_family		= AF_INET;
 	log_sock.sin_port		= htons(4001);
-	log_sock.sin_addr.s_addr	= inet_addr("192.168.75.11");
+	log_sock.sin_addr.s_addr	= inet_addr("192.168.123.11");
 
 	if(connect(log_fd, (struct sockaddr*)&log_sock, sizeof(log_sock)) < 0)
 	{

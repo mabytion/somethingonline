@@ -10,7 +10,7 @@ var Router *gin.Engine
 func CreateUrlMappings() {
 	Router = gin.Default()
 
-	Router.Use(controllers.Cors())
+//	Router.Use(controllers.Cors())
 	auth := Router.Group("/auth")
 	{
 		auth.GET("/health", controllers.Health)

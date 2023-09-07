@@ -13,8 +13,6 @@ var dbmap = initDb()
 
 func initDb() *gorp.DbMap {
 	db, err := sql.Open("mysql","auth:nasang@/userdb")
-	log.Print("dbinit() >> ")
-	log.Println(db)
 
 	var version string
 	err = db.QueryRow("SELECT VERSION()").Scan(&version)
