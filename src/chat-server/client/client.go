@@ -23,7 +23,7 @@ func main() {
 	user := models.User{id, pw}
 	ubytes, _ := json.Marshal(user)
 	req := bytes.NewBuffer(ubytes)
-	res, err := http.Post("http://192.168.75.15:8081/auth/login", "application/json", req)
+	res, err := http.Post("http://192.168.75.14:8081/auth/login", "application/json", req)
 
 	resBody, err := ioutil.ReadAll(res.Body)
 	if err == nil {
@@ -34,7 +34,7 @@ func main() {
 }
 
 func client(token string) {
-	c, err := net.Dial("tcp", "127.0.0.1:8082")
+	c, err := net.Dial("tcp", "192.168.75.12:8082")
 	if err != nil {
 		fmt.Println(err)
 	}

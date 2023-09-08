@@ -71,8 +71,6 @@ func PostUser(c *gin.Context) {
 	var user models.User
 	c.Bind(&user)
 
-	log.Println(user)
-
 	if user.Id != "" && user.Passwd != "" && user.Email != "" {
 		if insert, _ := dbmap.Exec(`INSERT INTO user (id, passwd, email) VALUES (?, ?, ?)`, user.Id, user.Passwd, user.Email); insert != nil {
 				c.JSON(201, gin.H{"message":"signup successful"})
