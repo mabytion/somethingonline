@@ -30,6 +30,7 @@
 #include <sys/epoll.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <signal.h>
 
 #include "header/jwt-c.h"
 
@@ -50,6 +51,8 @@ void sendMsg(struct epoll_event ev, char* msg);
 
 int main()
 {
+	signal(SIGPIPE, SIG_IGN);
+
 //	struct node** hashTable = createHashTable();
 	struct JToken* token;
 	struct node** hashTable;
@@ -180,11 +183,12 @@ int main()
 					printf("accept fd: %d\n", client_fd);
 				#endif
 
-					read(client_fd, buf, BUFF_SIZE+1);
-
+					read_size = read(client_fd, buf, BUFF_SIZE+1);
 				#ifdef DEBUG
-					printf("read: %s\n", buf);
+					print_hex("buf", buf, read_size);
+					printf("buf: %s\n", buf);
 				#endif
+
 					token = createJToken();
 					initJToken(token, buf);
 					if(verifyJToken(token, skey))
@@ -251,6 +255,10 @@ int main()
 					user_data = events[i].data.ptr;
 					memset(buf, 0, BUFF_SIZE+1);
 					read_size = read(user_data->fd, buf, BUFF_SIZE+1);
+				#ifdef DEBUG
+					print_hex("buf", buf, read_size);
+					printf("buf: %s\n", buf);
+				#endif
 					if(read_size <= 0)
 					{
 						epoll_ctl(epoll_fd, EPOLL_CTL_DEL, user_data->fd, events);
