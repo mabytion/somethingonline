@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"log"
-	"strconv"
 
 	"auth/models"
 	jtk "mabytion/jwt"
@@ -24,18 +23,14 @@ func GetUser(c *gin.Context) {
 }
 
 func GetUserDetail(c *gin.Context) {
-	id := c.Params.ByName("cid")
-	var user models.User
-	err := dbmap.SelectOne(&user, "SELECT * FROM user WHERE id=? LIMIT 1", id)
+	id := c.Params.ByName("id")
+	log.Println(id);
+	var user models.User2
+	err := dbmap.SelectOne(&user, "SELECT id FROM user WHERE id=? LIMIT 1", id)
 
 	if err == nil {
-		user_id, _ := strconv.ParseInt(id, 0, 64)
-
-		content := &models.User{
-			Cid:	user_id,
+		content := &models.User2{
 			Id:	user.Id,
-			Passwd:	user.Passwd,
-			Email:	user.Email,
 		}
 		c.JSON(200, content)
 	} else {

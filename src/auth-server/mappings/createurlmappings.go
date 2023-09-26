@@ -14,6 +14,7 @@ func CreateUrlMappings() {
 	auth := Router.Group("/auth")
 	{
 		auth.GET("/health", controllers.Health)
+		auth.GET("/getuser/:id", controllers.GetUserDetail)
 		auth.POST("/signup", controllers.PostUser)
 		auth.POST("/login", controllers.Login)
 	}
