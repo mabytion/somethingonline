@@ -37,6 +37,7 @@
 #define MAX_CLIENT 100
 #define BUFF_SIZE 1024
 #define LOG_SIZE 1536
+#define PIPENAME "./pipe"
 
 struct udata
 {
@@ -64,11 +65,13 @@ int main()
 
 	int listen_fd = 0;
 	int client_fd = 0;
-	int log_fd = 0;
+	int pipe_fd = 0;
 	int ret = 0;
 	int epoll_fd = 0;
 	int client_fd_size = 0;
 	int optval = 1;
+
+	int pid;
 
 	struct udata* user_data;
 
@@ -79,25 +82,29 @@ int main()
 	int i;
 
 	events = (struct epoll_event*)malloc(sizeof(struct epoll_event) * SOMAXCONN);
-	/* to log server */
-	if((log_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+
+	if(access(PIPENAME, F_OK) == 0)
 	{
-		printf("create log socket fail\n");
-		return -1;
+		unlink(PIPENAME);
+	}
+	
+	if(mkfifo(PIPENAME, 0666) < 0)
+	{
+		printf("fail to open pipe\n");
+		return 0;
 	}
 
-	memset(&log_sock, 0, sizeof(log_sock));
-	log_sock.sin_family		= AF_INET;
-	log_sock.sin_port		= htons(4001);
-	log_sock.sin_addr.s_addr	= inet_addr("192.168.123.11");
+	pid = fork();
 
-	if(connect(log_fd, (struct sockaddr*)&log_sock, sizeof(log_sock)) < 0)
+	if(pid == 0)
 	{
-		printf("connect err\n");
-		fprintf(stderr, "%s\n", strerror(errno));
+		execlp("./logger", "./logger", NULL);
 	}
-	printf("Connected.\n");
 
+	if((pipe_fd = open(PIPENAME, O_WRONLY)) < 0)
+	{
+		printf("pipe open err\n");
+	}
 
 	/* serv sock setting */
 	if((listen_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
@@ -275,7 +282,7 @@ int main()
 					{
 						memset(tmp, 0, LOG_SIZE);
 						sprintf(tmp, "0/chat/chat/%s/%s\0", user_data->name, buf);
-						write(log_fd, tmp, strlen(tmp));
+						write(pipe_fd, tmp, strlen(tmp));
 						sendMsg(events[i], buf);
 					}
 					
